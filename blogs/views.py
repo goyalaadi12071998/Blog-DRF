@@ -6,7 +6,7 @@ from blogs.serializers import BlogSerializer
 from comments.models import Comment
 from comments.serializers import CommentSerializer
 
-@api_view(['GET',"POST"])
+@api_view(['GET','POST'])
 def blog_list(request):
     if(request.method == 'GET'):
         blogs = Blog.objects.all()
@@ -32,9 +32,13 @@ def blog_detail(request,pk,format=None):
 
     if request.method == 'GET':
         serializer = BlogSerializer(blog)
-        # comments = Comment.objects.filter(blog=pk)
-        # serializer2 = CommentSerializer(comments, many=True)
-        return Response(serializer.data,status=status.HTTP_200_OK)
+        comments = Comment.objects.filter(blog=pk)
+        serializer2 = CommentSerializer(comments, many=True)
+        data = {
+            "blog": serializer.data,
+            "comments": serializer2.data
+        }
+        return Response(data,status=status.HTTP_200_OK)
     
     elif request.method == 'PUT':
         serializer = BlogSerializer(data=request.data)
